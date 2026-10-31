@@ -73,12 +73,37 @@ function updateImageMetaText(suffix = '') {
  */
 function buildFileName(ext) {
   const rawTitle = (captureMeta && captureMeta.pageTitle) || 'longscreenshot';
-  const cleanTitle = rawTitle
-    .replace(/[\\/:*?"<>|]/g, '_')
-    .replace(/\s+/g, '_')
-    .slice(0, 60);
+  const cleanTitle =
+    rawTitle
+      .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/g, '')
+      .replace(/[\\/:*?"<>|#%&{}$!'`@+=]/g, '_')
+      .replace(/\s+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '')
+      .slice(0, 60) || 'longscreenshot';
   const dateStr = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
   return `${cleanTitle}_${dateStr}.${ext}`;
+}
+
+/**
+ * ฟังก์ชันดาวน์โหลดไฟล์ที่เข้ากันได้กับทั้ง Chrome, Brave และ Edge
+ * ป้องกันบั๊กของ Brave PDF Viewer ที่เปลี่ยนชื่อไฟล์จาก blob: URL เป็นรหัส UUID
+ */
+function triggerBlobDownload(blob, fileName) {
+  // ใช้ application/octet-stream เพื่อบังคับให้เบราว์เซอร์ดาวน์โหลดไฟล์โดยตรงตามชื่อ fileName
+  // ไม่ให้ Built-in PDF Handler ของ Brave เข้ามาแทรกแซงและตัดชื่อไฟล์ทิ้งเป็น UUID
+  const safeFile = new File([blob], fileName, { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(safeFile);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 60000);
 }
 
 /**
@@ -656,12 +681,7 @@ async function exportToPdf(mode = 'single') {
     }
 
     const pdfBlob = buildPdfBlobFromSlices(pageSlices);
-    const url = URL.createObjectURL(pdfBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = buildFileName('pdf');
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    triggerBlobDownload(pdfBlob, buildFileName('pdf'));
 
     const modeLabel = mode === 'a4' ? `แบ่งหน้า A4 (${pageSlices.length} หน้า)` : 'หน้าเดียวยาว';
     showToast(`✅ บันทึกไฟล์ PDF (${modeLabel}) เรียบร้อยแล้ว`);
@@ -714,12 +734,7 @@ downloadPdfBtn.addEventListener('click', () => {
 downloadPngBtn.addEventListener('click', () => {
   canvas.toBlob((blob) => {
     if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = buildFileName('png');
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    triggerBlobDownload(blob, buildFileName('png'));
     showToast('✅ บันทึกไฟล์ PNG เรียบร้อยแล้ว');
   }, 'image/png');
 });
@@ -727,12 +742,7 @@ downloadPngBtn.addEventListener('click', () => {
 downloadJpgBtn.addEventListener('click', () => {
   canvas.toBlob((blob) => {
     if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = buildFileName('jpg');
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    triggerBlobDownload(blob, buildFileName('jpg'));
     showToast('✅ บันทึกไฟล์ JPG เรียบร้อยแล้ว');
   }, 'image/jpeg', 0.92);
 });
