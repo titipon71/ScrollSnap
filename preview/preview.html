@@ -21,12 +21,30 @@
         🔍 ซูม 100%
       </button>
 
-      <button id="copyBtn" class="secondary-btn">
-        📋 คัดลอกรูป (Copy)
+      <button id="cropToggleBtn" class="secondary-btn" title="ตัดขอบภาพเฉพาะส่วนที่ต้องการ">
+        ✂️ ตัดภาพ (Crop)
       </button>
 
+      <button id="resetCropBtn" class="warning-btn hidden" title="ย้อนกลับไปใช้ภาพเต็มต้นฉบับก่อนตัด">
+        ↩️ คืนค่าต้นฉบับ
+      </button>
+
+      <button id="copyBtn" class="secondary-btn">
+        📋 คัดลอกรูป
+      </button>
+
+      <div class="pdf-export-group">
+        <select id="pdfModeSelect" class="pdf-select" title="เลือกรูปแบบหน้ากระดาษ PDF">
+          <option value="single" selected>PDF (หน้าเดียวยาว)</option>
+          <option value="a4">PDF (แบ่งหน้า A4)</option>
+        </select>
+        <button id="downloadPdfBtn" class="pdf-btn">
+          📄 บันทึก PDF
+        </button>
+      </div>
+
       <button id="downloadJpgBtn" class="secondary-btn">
-        ⬇️ บันทึก JPG
+        ⬇️ JPG
       </button>
 
       <button id="downloadPngBtn" class="primary-btn">
@@ -39,6 +57,34 @@
     <div id="statusBanner" class="status-banner hidden"></div>
     <div id="canvasWrapper" class="canvas-wrapper fit-width">
       <canvas id="resultCanvas"></canvas>
+
+      <!-- โอเวอร์เลย์สำหรับโหมด Crop ภาพ -->
+      <div id="cropOverlay" class="crop-overlay hidden">
+        <div id="cropBox" class="crop-box">
+          <div class="crop-grid"></div>
+          <div id="cropSizeBadge" class="crop-size-badge">0 × 0 px</div>
+
+          <!-- จุดจับปรับขนาดทั้ง 8 ทิศทาง -->
+          <div class="crop-handle handle-nw" data-dir="nw"></div>
+          <div class="crop-handle handle-n" data-dir="n"></div>
+          <div class="crop-handle handle-ne" data-dir="ne"></div>
+          <div class="crop-handle handle-e" data-dir="e"></div>
+          <div class="crop-handle handle-se" data-dir="se"></div>
+          <div class="crop-handle handle-s" data-dir="s"></div>
+          <div class="crop-handle handle-sw" data-dir="sw"></div>
+          <div class="crop-handle handle-w" data-dir="w"></div>
+
+          <!-- ปุ่มลอยยืนยัน / ยกเลิกเกาะติดกรอบ Crop -->
+          <div id="cropFloatingBar" class="crop-floating-bar">
+            <button id="applyCropBtn" type="button" class="crop-action-apply" title="ยืนยันการตัดภาพ (Enter)">
+              ✓ ตัดภาพ (Enter)
+            </button>
+            <button id="cancelCropBtn" type="button" class="crop-action-cancel" title="ยกเลิก (Esc)">
+              ✕ ยกเลิก (Esc)
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 

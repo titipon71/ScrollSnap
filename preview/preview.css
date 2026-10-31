@@ -23,6 +23,7 @@ body {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #1e293b;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .topbar-left {
@@ -50,7 +51,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 460px;
+  max-width: 340px;
 }
 
 .submeta {
@@ -62,13 +63,16 @@ body {
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .primary-btn,
-.secondary-btn {
-  padding: 8px 14px;
+.secondary-btn,
+.warning-btn,
+.pdf-btn {
+  padding: 8px 13px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
@@ -96,8 +100,60 @@ body {
   background: #334155;
 }
 
+.secondary-btn.active-tool {
+  background: #4f46e5;
+  border-color: #6366f1;
+  color: #ffffff;
+}
+
+.warning-btn {
+  background: #3b2314;
+  border-color: #9a3412;
+  color: #fdba74;
+}
+
+.warning-btn:hover {
+  background: #431407;
+}
+
+.pdf-export-group {
+  display: inline-flex;
+  align-items: center;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pdf-select {
+  background: transparent;
+  color: #e2e8f0;
+  border: none;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.pdf-select option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.pdf-btn {
+  background: #0d9488;
+  color: #ffffff;
+  border-radius: 0;
+  border-left: 1px solid #334155;
+}
+
+.pdf-btn:hover {
+  background: #0f766e;
+}
+
 .viewer-area {
-  padding: 28px 20px 60px;
+  padding: 28px 20px 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -115,11 +171,13 @@ body {
 }
 
 .canvas-wrapper {
+  position: relative;
   background: #ffffff;
   border-radius: 6px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
   overflow: hidden;
   max-width: 100%;
+  user-select: none;
 }
 
 .canvas-wrapper.fit-width canvas {
@@ -139,6 +197,113 @@ body {
   height: auto;
   display: block;
   cursor: zoom-out;
+}
+
+/* ========================
+   Interactive Crop Overlay
+   ======================== */
+.crop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  cursor: crosshair;
+  overflow: hidden;
+}
+
+.crop-box {
+  position: absolute;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 99999px rgba(15, 23, 42, 0.72);
+  cursor: move;
+}
+
+.crop-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+  background-size: 33.333% 33.333%;
+}
+
+.crop-size-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #f8fafc;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 5;
+}
+
+.crop-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border: 2px solid #2563eb;
+  border-radius: 3px;
+  z-index: 6;
+}
+
+.handle-nw { top: -6px; left: -6px; cursor: nwse-resize; }
+.handle-n  { top: -6px; left: calc(50% - 6px); cursor: ns-resize; }
+.handle-ne { top: -6px; right: -6px; cursor: nesw-resize; }
+.handle-e  { top: calc(50% - 6px); right: -6px; cursor: ew-resize; }
+.handle-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+.handle-s  { bottom: -6px; left: calc(50% - 6px); cursor: ns-resize; }
+.handle-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.handle-w  { top: calc(50% - 6px); left: -6px; cursor: ew-resize; }
+
+.crop-floating-bar {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.92);
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+
+.crop-action-apply,
+.crop-action-cancel {
+  padding: 6px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+
+.crop-action-apply {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.crop-action-apply:hover {
+  background: #1d4ed8;
+}
+
+.crop-action-cancel {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.crop-action-cancel:hover {
+  background: #475569;
 }
 
 .hidden {
