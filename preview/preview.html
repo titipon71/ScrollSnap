@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LongScreenshot - Preview</title>
+  <link rel="stylesheet" href="preview.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <img src="../icons/icon48.png" alt="Logo" class="logo" />
+      <div class="meta">
+        <h1 id="pageTitle">กำลังประมวลผลภาพ...</h1>
+        <p id="imageMeta" class="submeta">กำลังต่อเฟรมภาพด้วย Canvas</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button id="zoomToggleBtn" class="secondary-btn" title="สลับขนาดพอดีหน้าจอ / ขนาดจริง 100%">
+        🔍 ซูม 100%
+      </button>
+
+      <button id="copyBtn" class="secondary-btn">
+        📋 คัดลอกรูป (Copy)
+      </button>
+
+      <button id="downloadJpgBtn" class="secondary-btn">
+        ⬇️ บันทึก JPG
+      </button>
+
+      <button id="downloadPngBtn" class="primary-btn">
+        ⬇️ บันทึก PNG
+      </button>
+    </div>
+  </header>
+
+  <main class="viewer-area">
+    <div id="statusBanner" class="status-banner hidden"></div>
+    <div id="canvasWrapper" class="canvas-wrapper fit-width">
+      <canvas id="resultCanvas"></canvas>
+    </div>
+  </main>
+
+  <script src="preview.js"></script>
+</body>
+</html>
